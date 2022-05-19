@@ -11,6 +11,7 @@ reg                   ready     = 0;
 reg                   valid     = 0;
 reg  [DATA_WIDTH-1:0] data_src     ;
 wire [DATA_WIDTH-1:0] data_dest    ;
+wire ready_output;
 
 HD #(
     .DATA_WIDTH(          
@@ -21,18 +22,15 @@ HD #(
     .ready    (ready    ),
     .valid    (valid    ),
     .data_src (data_src ),
-    .data_dest(data_dest)
+    .data_dest(data_dest),
+    .ready_output(ready_output)
 );
 
 
 always
     #5  clk = ! clk ;
-integer i = 1;
-always @(posedge clk) begin
-    i = i+1;
-end
-always @(posedge clk) begin
-    if(ready&&valid)data_src=data_src+1;
+always @(negedge clk) begin
+    if(ready_output&&valid)data_src=data_src+1;
 end
 
 initial begin
@@ -40,34 +38,36 @@ initial begin
     $dumpfile("wave.vcd");
     $dumpvars(0, HD_tb);
     data_src=1;
-    @(posedge clk) rst=1;
-    @(posedge clk) rst=0;
-    @(posedge clk) ;
-    @(posedge clk) valid=1;
-    @(posedge clk) ;
-    @(posedge clk) ready=1;
-    @(posedge clk) ready=0;
-    @(posedge clk) ;
-    @(posedge clk) ;
-    @(posedge clk) ;
-    @(posedge clk) valid=0;
-    @(posedge clk) valid=1;
-    @(posedge clk) ;
-    @(posedge clk) ready=1;
-    @(posedge clk) ;
-    @(posedge clk) ;
-    @(posedge clk) ;
-    @(posedge clk) ;
-    @(posedge clk) ready=0;
-    @(posedge clk) valid=0;
-    @(posedge clk) ;
-    @(posedge clk) ;
-    @(posedge clk) ready=1;
-    @(posedge clk) ;
-    @(posedge clk) valid=1;
-    @(posedge clk) ;
-    @(posedge clk) valid=0;
-    @(posedge clk) ready=0;
+    @(negedge clk) rst=1;
+    @(negedge clk) rst=0;
+    @(negedge clk) ;
+    @(negedge clk) valid=1;
+    @(negedge clk) ;
+    @(negedge clk) ready=1;
+    @(negedge clk) ready=0;
+    @(negedge clk) ;
+    @(negedge clk) ;
+    @(negedge clk) ;
+    @(negedge clk) valid=0;
+    @(negedge clk) valid=1;
+    @(negedge clk) ;
+    @(negedge clk) ready=1;
+    @(negedge clk) ;
+    @(negedge clk) ;
+    @(negedge clk) ;
+    @(negedge clk) ;
+    @(negedge clk) ready=0;
+    @(negedge clk) ;
+    @(negedge clk) ;
+    @(negedge clk) valid=0;
+    @(negedge clk) ;
+    @(negedge clk) ;
+    @(negedge clk) ready=1;
+    @(negedge clk) ;
+    @(negedge clk) valid=1;
+    @(negedge clk) ;
+    @(negedge clk) valid=0;
+    @(negedge clk) ready=0;
     #50 $finish;
 end
 
