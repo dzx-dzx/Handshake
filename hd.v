@@ -6,20 +6,11 @@ module HD #(parameter DATA_WIDTH = 16) (
     input      [DATA_WIDTH-1:0] data_src ,
     output reg [DATA_WIDTH-1:0] data_dest
 );
-    reg  [DATA_WIDTH-1:0] pipe_data ;
+    reg  [DATA_WIDTH-1:0] pipe_data   ;
     reg                   valid_output;
     wire                  ready_output;
-    assign ready_output = (ready||~valid_output);
-    always @(*) begin
+    always @(ready or valid or pipe_data) begin
         data_dest = (ready&&valid)?pipe_data:0;
-    end
-    always @(posedge clk) begin
-        if(rst)begin
-            pipe_data <= 0;
-        end
-        else begin
-            pipe_data <= (ready_output&&valid)?data_src:pipe_data;
-        end
     end
     always @(posedge clk) begin
         if(rst)begin
@@ -29,4 +20,13 @@ module HD #(parameter DATA_WIDTH = 16) (
             valid_output <= ready_output?valid:valid_output;
         end
     end
+    always @(posedge clk) begin
+        if(rst)begin
+            pipe_data <= 0;
+        end
+        else begin
+            pipe_data <= (ready_output&&valid)?data_src:pipe_data;
+        end
+    end
+    assign ready_output = (ready||~valid_output);
 endmodule

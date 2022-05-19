@@ -24,7 +24,16 @@ HD #(
     .data_dest(data_dest)
 );
 
-reg [1:0] test_vector[0:2];
+
+always
+    #5  clk = ! clk ;
+integer i = 1;
+always @(posedge clk) begin
+    i = i+1;
+end
+always @(posedge clk) begin
+    if(ready&&valid)data_src=data_src+1;
+end
 
 initial begin
     clk=0;
@@ -47,18 +56,20 @@ initial begin
     @(posedge clk) ready=1;
     @(posedge clk) ;
     @(posedge clk) ;
+    @(posedge clk) ;
+    @(posedge clk) ;
+    @(posedge clk) ready=0;
+    @(posedge clk) valid=0;
+    @(posedge clk) ;
+    @(posedge clk) ;
+    @(posedge clk) ready=1;
+    @(posedge clk) ;
+    @(posedge clk) valid=1;
+    @(posedge clk) ;
+    @(posedge clk) valid=0;
     @(posedge clk) ready=0;
     #50 $finish;
 end
 
-integer i = 1;
-always @(posedge clk) begin
-    i = i+1;
-end
-always @(*) begin
-    if(valid&&ready) data_src=data_src+1;
-end
-always
-    #5  clk = ! clk ;
 
 endmodule
