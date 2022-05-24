@@ -1,36 +1,28 @@
-module HD #(parameter DATA_WIDTH = 16) (
-    input                       clk      ,
-    input                       rst      ,
-    input                       ready    ,
-    input                       valid    ,
-    input      [DATA_WIDTH-1:0] data_src ,
-    output reg [DATA_WIDTH-1:0] data_dest,
-    output ready_output
+module HD #(parameter DATA_WIDTH = 32) (
+    input                       clk         ,
+    input                       rst         ,
+    input                       ready       ,
+    input                       valid       ,
+    input      [DATA_WIDTH-1:0] data_src    ,
+    output reg [DATA_WIDTH-1:0] data_dest   ,
+    output reg                  ready_output,
+    output reg                  valid_output
 );
-    reg  [DATA_WIDTH-1:0] pipe_data       ;
-    reg  [DATA_WIDTH-1:0] pipe_backup     ;
-    reg                   valid_output    ;
-    reg                   pipe_backup_full;
-    wire                  ready_output    ;
+    reg [DATA_WIDTH-1:0] pipe_data        ;
+    reg [DATA_WIDTH-1:0] pipe_backup      ;
+    reg                  pipe_valid       ;
+    reg                  pipe_backup_valid;
 
-    reg ready_delay;
-    always @(posedge clk) begin
-        if(rst)begin
-            ready_delay <= 0;
-        end
-        else begin
-            ready_delay <= ready;
-        end
+    always @(*) begin
+        ready_output = ~pipe_backup_valid;
     end
-    assign ready_output = (ready_delay||~valid_output);
-
 
     always @(posedge clk) begin
         if(rst)begin
-            valid_output <= 0;
+            pipe_valid <= 0;
         end
         else begin
-            valid_output <= ready_output?valid:valid_output;
+            pipe_valid <= ready_output ? valid : pipe_valid;
         end
     end
     always @(posedge clk) begin
@@ -38,7 +30,7 @@ module HD #(parameter DATA_WIDTH = 16) (
             pipe_data <= 0;
         end
         else begin
-            pipe_data <= (ready_output&&valid)?data_src:pipe_data;
+            pipe_data <= ready_output ? data_src : pipe_data;
         end
     end
     always @(posedge clk) begin
@@ -46,24 +38,24 @@ module HD #(parameter DATA_WIDTH = 16) (
             pipe_backup <= 0;
         end
         else begin
-            pipe_backup <= (ready_output)?pipe_backup:pipe_data;
+            pipe_backup <= (ready_output && ~ready)? pipe_data : pipe_backup;
         end
     end
     always @(posedge clk) begin
         if(rst)begin
-            pipe_backup_full <= 0;
+            pipe_backup_valid <= 0;
         end
         else begin
-            pipe_backup_full <= (ready_output)?~ready:pipe_backup_full;
+            pipe_backup_valid <= ~ready && (ready_output ? pipe_valid : pipe_backup_valid);
         end
     end
-
-    always @(posedge clk) begin
-        if(rst)begin
-            data_dest <= 0;
-        end
-        else begin
-            data_dest <= (ready_delay&&valid)?(pipe_backup_full?pipe_backup:pipe_data):0;
-        end
+    always @(*) begin
+        valid_output = pipe_valid || pipe_backup_valid;
+    end
+    always @(*) begin
+        ready_output = ~pipe_backup_valid;
+    end
+    always @(*) begin
+        data_dest = (pipe_backup_valid ? pipe_backup : pipe_data) ;
     end
 endmodule
