@@ -13,10 +13,6 @@ module HD #(parameter DATA_WIDTH = 32) (
     reg                  pipe_valid       ;
     reg                  pipe_backup_valid;
 
-    always @(*) begin
-        ready_output = ~pipe_backup_valid;
-    end
-
     always @(posedge clk) begin
         if(rst)begin
             pipe_valid <= 0;
@@ -38,7 +34,7 @@ module HD #(parameter DATA_WIDTH = 32) (
             pipe_backup <= 0;
         end
         else begin
-            pipe_backup <= (ready_output && ~ready)? pipe_data : pipe_backup;
+            pipe_backup <= (ready_output && ~ready) ? pipe_data : pipe_backup;
         end
     end
     always @(posedge clk) begin

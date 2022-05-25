@@ -12,6 +12,7 @@ reg                   valid        = 0;
 reg  [DATA_WIDTH-1:0] data_src        ;
 wire [DATA_WIDTH-1:0] data_dest       ;
 wire                  ready_output    ;
+wire                  valid_output    ;
 
 HD #(
     .DATA_WIDTH(          
@@ -23,7 +24,8 @@ HD #(
     .valid       (valid       ),
     .data_src    (data_src    ),
     .data_dest   (data_dest   ),
-    .ready_output(ready_output)
+    .ready_output(ready_output),
+    .valid_output(valid_output)
 );
 
 
