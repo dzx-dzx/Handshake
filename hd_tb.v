@@ -1,4 +1,5 @@
 `include "hd.v"
+`include "hd_compart_top.v"
 module HD_tb;
 
 // Parameters
@@ -14,10 +15,18 @@ wire [DATA_WIDTH-1:0] data_dest       ;
 wire                  ready_output    ;
 wire                  valid_output    ;
 
-HD #(
-    .DATA_WIDTH(          
-                DATA_WIDTH)  
-) HD_dut (
+// HD #(.DATA_WIDTH(DATA_WIDTH)) HD_dut (
+//     .clk         (clk         ),
+//     .rst         (rst         ),
+//     .ready       (ready       ),
+//     .valid       (valid       ),
+//     .data_src    (data_src    ),
+//     .data_dest   (data_dest   ),
+//     .ready_output(ready_output),
+//     .valid_output(valid_output)
+// );
+
+HD_COMPART #(.DATA_WIDTH(DATA_WIDTH)) HD_dut_compart (
     .clk         (clk         ),
     .rst         (rst         ),
     .ready       (ready       ),
