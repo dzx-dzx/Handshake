@@ -11,31 +11,29 @@ module HD_COMPART #(parameter DATA_WIDTH = 32) (
     output                  valid_output
 );
 wire [DATA_WIDTH-1:0] pipe_data        ;
-wire [DATA_WIDTH-1:0] pipe_backup      ;
 wire                  pipe_valid       ;
-wire                  pipe_backup_valid;
+wire                  pipe_ready       ;
+
 HD_SENDER #(.DATA_WIDTH(DATA_WIDTH)) hd_sender (
-    .clk              (clk              ),
-    .rst              (rst              ),
-    .data_src         (data_src         ),
-    .ready_output     (ready_output     ),
-    .valid            (valid            ),
-    .pipe_backup_valid(pipe_backup_valid),
-    .valid_output     (valid_output     ),
-    .pipe_valid       (pipe_valid       ),
-    .pipe_data        (pipe_data        )
+    .clk         (clk         ),
+    .rst         (rst         ),
+    .data_src    (pipe_data   ),
+    .ready       (ready       ),
+    .valid       (pipe_valid  ),
+    .ready_output(pipe_ready  ),
+    .valid_output(valid_output),
+    .data_dest   (data_dest   )
 );
 
 HD_RECEIVER #(.DATA_WIDTH(DATA_WIDTH)) hd_receiver (
-    .clk              (clk              ),
-    .rst              (rst              ),
-    .ready            (ready            ),
-    .pipe_data        (pipe_data        ),
-    .pipe_valid       (pipe_valid       ),
-    .ready_output     (ready_output     ),
-    .data_dest        (data_dest        ),
-    .pipe_backup      (pipe_backup      ),
-    .pipe_backup_valid(pipe_backup_valid)
+    .clk         (clk         ),
+    .rst         (rst         ),
+    .data_src    (data_src    ),
+    .ready       (pipe_ready  ),
+    .valid       (valid       ),
+    .ready_output(ready_output),
+    .valid_output(pipe_valid  ),
+    .data_dest   (pipe_data   )
 );
 
 endmodule
